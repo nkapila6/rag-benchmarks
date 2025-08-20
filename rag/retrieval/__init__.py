@@ -9,10 +9,14 @@ Created on 2025-08-13 14:19:18 Wednesday
 from .base import RetrievedDocument, BaseRetriever
 from .sparse_tfidf import TFIDFRetriever
 from .sparse_bm25 import BM25Retriever
+from .dense import DenseRetriever
+from .hybrid import HybridRetriever
 
 __all__ = [
     "RetrievedDocument",
     "BaseRetriever",
     "TFIDFRetriever",
-    "BM25Retriever"
+    "BM25Retriever",
+    "DenseRetriever",
+    "HybridRetriever"
     ]
