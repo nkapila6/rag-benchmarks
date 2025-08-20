@@ -13,6 +13,7 @@ import warnings
 import numpy as np
 from typing import List, Tuple
 from langchain_community.vectorstores import FAISS
+from langchain_community.vectorstores.utils import DistanceStrategy
 from langchain_core.documents import Document
 from langchain_community.embeddings import HuggingFaceEmbeddings
 warnings.filterwarnings("ignore", category=DeprecationWarning, module="langchain_community.embeddings")
@@ -24,7 +25,7 @@ class DenseRetriever(BaseRetriever):
         self.doc_ids: List[str] = [str(doc.metadata.get("doc_id", idx)) for idx, doc in enumerate(documents)]
         print(f"STEP[dense]: Creating embedding model and building FAISS index for {len(self.doc_ids)} documents ...")
         self.embeddings = HuggingFaceEmbeddings(model_name=model_name)
-        self.vectorstore = FAISS.from_documents(documents, self.embeddings)
+        self.vectorstore = FAISS.from_documents(documents, self.embeddings, distance_strategy=DistanceStrategy.COSINE) # https://python.langchain.com/api_reference/community/vectorstores/langchain_community.vectorstores.utils.DistanceStrategy.html#langchain_community.vectorstores.utils.DistanceStrategy
         print("STEP[dense]: FAISS index built.")
 
     def retrieve(self, query: str, top_k: int) -> List[RetrievedDocument]:
@@ -42,8 +43,7 @@ class DenseRetriever(BaseRetriever):
 
         results: List[RetrievedDocument] = []
         for doc, dist in docs_and_distances:
-            score = np.exp(-dist) # non linear mapping from dist to score, 0 is 1
-            
+            score = 1.0 - dist
             results.append(
                 RetrievedDocument(
                     doc_id=str(doc.metadata.get("doc_id", "")),
