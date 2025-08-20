@@ -23,8 +23,13 @@ def download_beir_dataset(dataset: str, out_dir: str) -> str:
     return os.path.join(out_dir, dataset)
 
 def load_beir(dataset: str, data_dir: str) -> Tuple[Dict[str, Any], Dict[str, Any], Dict[str, Dict[str, int]]]:
+    print(f"STEP[data]: Preparing to load BEIR dataset '{dataset}' from base dir {data_dir}")
     dataset_path = download_beir_dataset(dataset, data_dir)
+    print(f"STEP[data]: Loading BEIR data from {dataset_path} (split='test')")
     corpus, queries, qrels = GenericDataLoader(dataset_path).load(split="test")
+    print(
+        f"STEP[data]: Loaded corpus={len(corpus)} documents, queries={len(queries)}, qrels={len(qrels)}"
+    )
     return corpus, queries, qrels
 
 def corpus_to_documents(corpus: Dict[str, Dict[str, Any]]) -> List[Document]:
@@ -34,4 +39,5 @@ def corpus_to_documents(corpus: Dict[str, Dict[str, Any]]) -> List[Document]:
         content = "\n\n".join([p for p in text_parts if p])
         metadata = {"doc_id": doc_id, **{k: v for k, v in entry.items() if k not in {"text", "title"}}}
         docs.append(Document(page_content=content, metadata=metadata))
+    print(f"STEP[data]: Converted corpus to {len(docs)} LangChain Documents")
     return docs 
