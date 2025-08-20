@@ -10,7 +10,6 @@ from __future__ import annotations
 from .base import BaseRetriever, RetrievedDocument
 
 import warnings
-import numpy as np
 from typing import List, Tuple
 from langchain_community.vectorstores import FAISS
 from langchain_community.vectorstores.utils import DistanceStrategy
