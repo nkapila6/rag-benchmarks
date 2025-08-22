@@ -24,7 +24,9 @@ class DenseRetriever(BaseRetriever):
         self.doc_ids: List[str] = [str(doc.metadata.get("doc_id", idx)) for idx, doc in enumerate(documents)]
         print(f"STEP[dense]: Creating embedding model and building FAISS index for {len(self.doc_ids)} documents ...")
         self.embeddings = HuggingFaceEmbeddings(model_name=model_name)
-        self.vectorstore = FAISS.from_documents(documents, self.embeddings, distance_strategy=DistanceStrategy.COSINE) # https://python.langchain.com/api_reference/community/vectorstores/langchain_community.vectorstores.utils.DistanceStrategy.html#langchain_community.vectorstores.utils.DistanceStrategy
+        # https://github.com/langchain-ai/langchain/discussions/9819 -- 22.08 - added to use max inner product instead
+        # https://python.langchain.com/api_reference/community/vectorstores/langchain_community.vectorstores.utils.DistanceStrategy.html#langchain_community.vectorstores.utils.DistanceStrategy
+        self.vectorstore = FAISS.from_documents(documents, self.embeddings, distance_strategy=DistanceStrategy.MAX_INNER_PRODUCT) 
         print("STEP[dense]: FAISS index built.")
 
     def retrieve(self, query: str, top_k: int) -> List[RetrievedDocument]:
@@ -42,7 +44,7 @@ class DenseRetriever(BaseRetriever):
 
         results: List[RetrievedDocument] = []
         for doc, dist in docs_and_distances:
-            score = 1.0 - dist
+            score = dist # score = 1.0 - dist, not required since range is [0,1]
             results.append(
                 RetrievedDocument(
                     doc_id=str(doc.metadata.get("doc_id", "")),
