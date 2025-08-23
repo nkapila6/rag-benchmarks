@@ -36,6 +36,7 @@ def main() -> None:
     parser.add_argument("--batch_size", type=int, default=32)
 
     parser.add_argument("--output", type=str, default="./outputs/results.json")
+    parser.add_argument("--device", type=str, default=None, help="Device to use for models, e.g., 'cuda' or 'cpu'")
 
     args = parser.parse_args()
 
@@ -76,10 +77,17 @@ def main() -> None:
         documents=documents,
         dense_model=args.dense_model,
         rrf_k=args.rrf_k,
+        device=args.device,
     )
     print("STEP: Retriever built.")
     print("STEP: Building reranker...")
-    reranker = make_reranker(kind=args.reranker, bi_model=args.bi_model, cross_model=args.cross_model, batch_size=args.batch_size)
+    reranker = make_reranker(
+        kind=args.reranker,
+        bi_model=args.bi_model,
+        cross_model=args.cross_model,
+        batch_size=args.batch_size,
+        device=args.device,
+    )
     print("STEP: Reranker built.")
 
     print("STEP: Running evaluation over queries...")
@@ -96,4 +104,4 @@ def main() -> None:
 
 
 if __name__ == "__main__":
-    main() 
+    main()

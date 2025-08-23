@@ -7,7 +7,7 @@ Created on 2025-08-20 13:56:01 Wednesday
 """
 
 from __future__ import annotations
-from typing import Dict, Callable
+from typing import Dict, Callable, List, Optional
 from ..retrieval import (
     TFIDFRetriever,
     BM25Retriever,
@@ -39,10 +39,12 @@ class RetrievalPipeline:
 
 def make_retriever(
     kind: str,
-    documents,
-    dense_model: str | None = None,
-    rrf_k: int = 60,
+    documents: List[Document],
+    dense_model: str,
+    rrf_k: int=60,
+    device: Optional[str] = None,
 ) -> BaseRetriever:
+    """Factory function to create a retriever."""
     print(
         f"STEP[factory]: Building retriever kind='{kind}' "
         f"(dense_model={dense_model}, rrf_k={rrf_k}, "
@@ -53,10 +55,10 @@ def make_retriever(
     if kind == "bm25":
         return BM25Retriever(documents)
     if kind == "dense":
-        return DenseRetriever(documents, model_name=dense_model or "sentence-transformers/all-MiniLM-L6-v2")
+        return DenseRetriever(documents, model_name=dense_model or "sentence-transformers/all-MiniLM-L6-v2", device=device)
     if kind == "hybrid":
         sparse = BM25Retriever(documents)
-        dense = DenseRetriever(documents, model_name=dense_model or "sentence-transformers/all-MiniLM-L6-v2")
+        dense = DenseRetriever(documents, model_name=dense_model or "sentence-transformers/all-MiniLM-L6-v2", device=device)
         return HybridRetriever(
             sparse_retriever=sparse,
             dense_retriever=dense,
@@ -67,25 +69,21 @@ def make_retriever(
 
 def make_reranker(
     kind: str,
-    bi_model: str | None = None,
-    cross_model: str | None = None,
-    batch_size: int = 32,
+    bi_model: str,
+    cross_model: str,
+    batch_size: int,
+    device: Optional[str] = None,
 ) -> BaseReranker:
+    """Factory function to create a reranker."""
     print(
         f"STEP[factory]: Building reranker kind='{kind}' (bi_model={bi_model}, cross_model={cross_model}, batch_size={batch_size})"
     )
     if kind == "none":
         return NoReranker()
     if kind == "bi":
-        return BiEncoderReranker(
-            model_name=bi_model or "sentence-transformers/msmarco-distilbert-base-tas-b",
-            batch_size=batch_size,
-        )
+        return BiEncoderReranker(model_name=bi_model or "sentence-transformers/msmarco-distilbert-base-tas-b", batch_size=batch_size, device=device)
     if kind == "cross":
-        return CrossEncoderReranker(
-            model_name=cross_model or "cross-encoder/ms-marco-MiniLM-L-12-v2",
-            batch_size=batch_size,
-        )
+        return CrossEncoderReranker(model_name=cross_model or "cross-encoder/ms-marco-MiniLM-L-12-v2", batch_size=batch_size, device=device)
     raise ValueError(f"Unknown reranker kind: {kind}")
 
 # Named combos for reproducibility
@@ -206,4 +204,4 @@ COMBOS: Dict[str, Callable[..., RetrievalPipeline]] = {
     "hybrid+none": Hybrid_NoRerank,
     "hybrid+bi": Hybrid_Bi,
     "hybrid+cross": Hybrid_Cross,
-} 
+}

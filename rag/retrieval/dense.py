@@ -10,7 +10,7 @@ from __future__ import annotations
 from .base import BaseRetriever, RetrievedDocument
 
 import warnings
-from typing import List, Tuple
+from typing import List, Tuple, Optional
 from langchain_community.vectorstores import FAISS
 from langchain_community.vectorstores.utils import DistanceStrategy
 from langchain_core.documents import Document
@@ -23,13 +23,23 @@ class DenseRetriever(BaseRetriever):
                  # for retrieval, we choose all-minilm-l6-v2 because: 
                  # The all-* models were trained on all available training data (more than 1 billion training pairs) and are designed as general purpose models. 
                  # The all-mpnet-base-v2 model provides the best quality, while all-MiniLM-L6-v2 is 5 times faster and still offers good quality.
-                 model_name: str = "sentence-transformers/all-MiniLM-L6-v2"
+                 model_name: str = "sentence-transformers/all-MiniLM-L6-v2",
+                 device: Optional[str] = None,
                  ):
         print(f"STEP[dense]: Initializing DenseRetriever with model='{model_name}' ...")
         self.documents = documents
         self.doc_ids: List[str] = [str(doc.metadata.get("doc_id", idx)) for idx, doc in enumerate(documents)]
         print(f"STEP[dense]: Creating embedding model and building FAISS index for {len(self.doc_ids)} documents ...")
-        self.embeddings = HuggingFaceEmbeddings(model_name=model_name)
+        
+        model_kwargs = {}
+        # https://python.langchain.com/api_reference/huggingface/embeddings/langchain_huggingface.embeddings.huggingface.HuggingFaceEmbeddings.html
+        if device:
+            model_kwargs['device'] = device
+
+        self.embeddings = HuggingFaceEmbeddings(
+            model_name=model_name,
+            model_kwargs=model_kwargs
+        )
         # https://github.com/langchain-ai/langchain/discussions/9819 -- 22.08 - added to use max inner product instead
         # https://python.langchain.com/api_reference/community/vectorstores/langchain_community.vectorstores.utils.DistanceStrategy.html#langchain_community.vectorstores.utils.DistanceStrategy
         self.vectorstore = FAISS.from_documents(documents, self.embeddings, distance_strategy=DistanceStrategy.MAX_INNER_PRODUCT) 

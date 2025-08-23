@@ -64,6 +64,8 @@ def main():
                     output_path,
                     "--top_k",
                     "100",
+                    "--device",
+                    "cuda",
                 ]
                 subprocess.run(command, check=True)
 

@@ -19,8 +19,13 @@ class BiEncoderReranker(BaseReranker):
                  # for reranking, we choose all-mpnet because: 
                  # The all-* models were trained on all available training data (more than 1 billion training pairs) and are designed as general purpose models. 
                  # The all-mpnet-base-v2 model provides the best quality, while all-MiniLM-L6-v2 is 5 times faster and still offers good quality.
-                 batch_size: int = 32):
-        self.model = SentenceTransformer(model_name)
+                 batch_size: int = 32, 
+                 # if None, checks GPU to use
+                 # https://sbert.net/docs/package_reference/sentence_transformer/SentenceTransformer.html
+                 # https://sbert.net/docs/package_reference/cross_encoder/cross_encoder.html
+                 device=None
+                 ):
+        self.model = SentenceTransformer(model_name, device=device)
         self.batch_size = batch_size
         print(
             f"STEP[bi-reranker]: Initialized bi-encoder model='{model_name}', batch_size={batch_size}"
@@ -60,4 +65,4 @@ class BiEncoderReranker(BaseReranker):
         print(
             f"STEP[bi-reranker]: Top-{len(reranked)} doc_ids={top_ids} scores={top_scores}"
         )
-        return reranked 
+        return reranked

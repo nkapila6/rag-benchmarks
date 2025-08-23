@@ -7,9 +7,9 @@ Created on 2025-08-20 13:37:15 Wednesday
 """
 
 from __future__ import annotations
-from typing import List
+from typing import List, Optional
 import numpy as np
-from sentence_transformers import CrossEncoder
+from sentence_transformers.cross_encoder import CrossEncoder
 from .base import BaseReranker
 from ..retrieval.base import RetrievedDocument
 
@@ -18,8 +18,13 @@ class CrossEncoderReranker(BaseReranker):
                  # source: https://huggingface.co/cross-encoder/ms-marco-MiniLM-L6-v2
                  # we choose ms-marco-miniLM-L6-v2 as it has the highest score and can process 1.8k docs per sec
                  model_name: str = "cross-encoder/ms-marco-MiniLM-L6-v2", 
-                 batch_size: int = 32):
-        self.model = CrossEncoder(model_name)
+                 batch_size: int = 32,
+                 # if None, checks GPU to use
+                 # https://sbert.net/docs/package_reference/sentence_transformer/SentenceTransformer.html
+                 # https://sbert.net/docs/package_reference/cross_encoder/cross_encoder.html
+                 device=None
+                 ):
+        self.model = CrossEncoder(model_name, device=device)
         self.batch_size = batch_size
         print(
             f"STEP[cross-reranker]: Initialized cross-encoder model='{model_name}', batch_size={batch_size}"
@@ -51,4 +56,4 @@ class CrossEncoderReranker(BaseReranker):
         print(
             f"STEP[cross-reranker]: Top-{len(reranked)} doc_ids={top_ids} scores={top_scores}"
         )
-        return reranked 
+        return reranked
