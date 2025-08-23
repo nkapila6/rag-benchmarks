@@ -14,7 +14,12 @@ from .base import BaseReranker
 from ..retrieval.base import RetrievedDocument
 
 class BiEncoderReranker(BaseReranker):
-    def __init__(self, model_name: str = "sentence-transformers/msmarco-distilbert-base-tas-b", batch_size: int = 32):
+    def __init__(self, model_name: str = "sentence-transformers/all-mpnet-base-v2",
+                 # source: https://www.sbert.net/docs/sentence_transformer/pretrained_models.html
+                 # for reranking, we choose all-mpnet because: 
+                 # The all-* models were trained on all available training data (more than 1 billion training pairs) and are designed as general purpose models. 
+                 # The all-mpnet-base-v2 model provides the best quality, while all-MiniLM-L6-v2 is 5 times faster and still offers good quality.
+                 batch_size: int = 32):
         self.model = SentenceTransformer(model_name)
         self.batch_size = batch_size
         print(

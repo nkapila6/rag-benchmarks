@@ -18,7 +18,13 @@ from langchain_community.embeddings import HuggingFaceEmbeddings
 warnings.filterwarnings("ignore", category=DeprecationWarning, module="langchain_community.embeddings")
 
 class DenseRetriever(BaseRetriever):
-    def __init__(self, documents: List[Document], model_name: str = "sentence-transformers/all-MiniLM-L6-v2"):
+    def __init__(self, documents: List[Document], 
+                 # source: https://www.sbert.net/docs/sentence_transformer/pretrained_models.html
+                 # for retrieval, we choose all-minilm-l6-v2 because: 
+                 # The all-* models were trained on all available training data (more than 1 billion training pairs) and are designed as general purpose models. 
+                 # The all-mpnet-base-v2 model provides the best quality, while all-MiniLM-L6-v2 is 5 times faster and still offers good quality.
+                 model_name: str = "sentence-transformers/all-MiniLM-L6-v2"
+                 ):
         print(f"STEP[dense]: Initializing DenseRetriever with model='{model_name}' ...")
         self.documents = documents
         self.doc_ids: List[str] = [str(doc.metadata.get("doc_id", idx)) for idx, doc in enumerate(documents)]

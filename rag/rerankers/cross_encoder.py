@@ -14,7 +14,11 @@ from .base import BaseReranker
 from ..retrieval.base import RetrievedDocument
 
 class CrossEncoderReranker(BaseReranker):
-    def __init__(self, model_name: str = "cross-encoder/ms-marco-MiniLM-L-12-v2", batch_size: int = 32):
+    def __init__(self, 
+                 # source: https://huggingface.co/cross-encoder/ms-marco-MiniLM-L6-v2
+                 # we choose ms-marco-miniLM-L6-v2 as it has the highest score and can process 1.8k docs per sec
+                 model_name: str = "cross-encoder/ms-marco-MiniLM-L6-v2", 
+                 batch_size: int = 32):
         self.model = CrossEncoder(model_name)
         self.batch_size = batch_size
         print(
