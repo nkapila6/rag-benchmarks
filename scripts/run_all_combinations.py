@@ -62,6 +62,8 @@ def main():
                     reranker_name,
                     "--output",
                     output_path,
+                    "--top_k",
+                    "100",
                 ]
                 subprocess.run(command, check=True)
 
