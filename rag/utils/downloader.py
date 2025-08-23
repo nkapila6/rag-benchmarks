@@ -19,6 +19,7 @@ def download_beir_dataset(dataset: str, out_dir: str) -> str:
     if os.path.isdir(data_path):
         return data_path
     url = f"https://public.ukp.informatik.tu-darmstadt.de/thakur/BEIR/datasets/{dataset}.zip"
+    print(f"The url is {url}")
     out_dir = util.download_and_unzip(url, out_dir)
     return os.path.join(out_dir, dataset)
 
