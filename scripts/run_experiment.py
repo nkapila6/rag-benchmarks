@@ -31,8 +31,8 @@ def main() -> None:
     parser.add_argument("--w_dense", type=float, default=0.5)
 
     parser.add_argument("--reranker", type=str, choices=["none", "bi", "cross"], required=True)
-    parser.add_argument("--bi_model", type=str, default="sentence-transformers/msmarco-distilbert-base-tas-b")
-    parser.add_argument("--cross_model", type=str, default="cross-encoder/ms-marco-MiniLM-L-12-v2")
+    parser.add_argument("--bi_model", type=str, default="sentence-transformers/all-mpnet-base-v2")
+    parser.add_argument("--cross_model", type=str, default="cross-encoder/ms-marco-MiniLM-L6-v2")
     parser.add_argument("--batch_size", type=int, default=32)
 
     parser.add_argument("--output", type=str, default="./outputs/results.json")
